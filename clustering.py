@@ -36,7 +36,7 @@ data_features = vectorizer.fit_transform(reviews)
 data_features = data_features.toarray()
 
 #dimention reduction
-svd = TruncatedSVD(2)
+svd = TruncatedSVD(10)
 normalizer = Normalizer(copy=False)
 lsa = make_pipeline(svd, normalizer)
 
@@ -44,11 +44,39 @@ X = lsa.fit_transform(data_features)
 
 #apply kmeans
 km = KMeans(n_clusters=5, init='k-means++', max_iter=100, n_init=1)
-km.fit(X)
+km.fit(data_features)
+
+def print_top_words(model, feature_names, n_top_words):
+    for topic_idx, topic in enumerate(model.cluster_centers_):
+        print("Topic #%d:" % topic_idx)
+        print(" ".join([feature_names[i]
+                        for i in topic.argsort()[:-n_top_words - 1:-1]]))
+feature_names = vectorizer.get_feature_names()
+print_top_words(km,feature_names, 10)
+
+
+'''
+_________________________
+THIS IS THE TOPIC DISCOVERY RESULT FROM KMEANS:
+
+Topic #0:
+love place portos balls potato cakes pastries porto sandwiches lines
+Topic #1:
+cheese rolls guava potato balls good pastries porto roll place
+Topic #2:
+line place food good porto long time just wait order
+Topic #3:
+cake best potato sandwich balls good amazing cuban place porto
+Topic #4:
+great food place service prices pastries amazing long good sandwiches
+
+'''
+
+'''
+# plot reduced dimention features
 x=[]
 y=[]
 z=[]
-
 for idx,i in enumerate(X):
     if i[0]==0:
         print inspect[idx]
@@ -59,5 +87,5 @@ for idx,i in enumerate(X):
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(x, y, z, c='r')
-plt.show()
+plt.show()'''
 

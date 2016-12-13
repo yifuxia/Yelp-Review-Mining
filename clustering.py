@@ -36,15 +36,17 @@ data_features = vectorizer.fit_transform(reviews)
 data_features = data_features.toarray()
 
 #dimention reduction
-svd = TruncatedSVD(10)
+svd = TruncatedSVD(5)
 normalizer = Normalizer(copy=False)
 lsa = make_pipeline(svd, normalizer)
 
 X = lsa.fit_transform(data_features)
 
 #apply kmeans
+#NOTE:!!!! DONT use reduced dimentionality in kmeans cuz it can't be traced back to find actual words!
 km = KMeans(n_clusters=5, init='k-means++', max_iter=100, n_init=1)
 km.fit(data_features)
+
 
 def print_top_words(model, feature_names, n_top_words):
     for topic_idx, topic in enumerate(model.cluster_centers_):
@@ -52,8 +54,30 @@ def print_top_words(model, feature_names, n_top_words):
         print(" ".join([feature_names[i]
                         for i in topic.argsort()[:-n_top_words - 1:-1]]))
 feature_names = vectorizer.get_feature_names()
-print_top_words(km,feature_names, 10)
+'''
+# print SVD result
 
+for topic_idx, topic in enumerate(np.dot(X.transpose(),data_features)):
+        print("Topic #%d:" % topic_idx)
+        print(" ".join([feature_names[i]
+                        for i in topic.argsort()[:-10 - 1:-1]]))
+'''
+print_top_words(km,feature_names, 10)
+'''
+_____________________________________________
+THIS IS THE TOPIC DISCOVERY RESULT FROM SVD:
+
+Topic #0:
+cheese place good potato balls porto pastries love line food
+Topic #1:
+cheese rolls guava potato balls roll dozen meat chicken pastry
+Topic #2:
+love best great rolls place cheese portos balls amazing cakes
+Topic #3:
+cake best love chocolate cakes porto portos bakery cuban birthday
+Topic #4:
+potato balls great sandwich meat cuban good food sandwiches chicken
+'''
 
 '''
 _________________________
